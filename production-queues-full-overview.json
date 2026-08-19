@@ -16,7 +16,7 @@
           "legacyOptions": {
             "type": "dashboard"
           },
-          "name": "Annotations \u0026 Alerts",
+          "name": "Annotations & Alerts",
           "query": {
             "datasource": {
               "name": "-- Grafana --"
@@ -30,8 +30,674 @@
       }
     ],
     "cursorSync": "Off",
+    "description": "SQS queue depth, job throughput, failures by class/exception, and dispatch-vs-process imbalance.",
     "editable": true,
     "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_size{scrape_job=~\"$environment\"})"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q1"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "Queue Size",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "yellow",
+                        "value": 100
+                      },
+                      {
+                        "color": "red",
+                        "value": 1000
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_pending_jobs{scrape_job=~\"$environment\"})"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q2"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 2,
+          "links": [],
+          "title": "Pending Jobs",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_reserved_jobs{scrape_job=~\"$environment\"})"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q3"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 3,
+          "links": [],
+          "title": "Reserved Jobs",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_delayed_jobs{scrape_job=~\"$environment\"})"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q4"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 4,
+          "links": [],
+          "title": "Delayed Jobs",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "max(app_queue_oldest_pending_job_age_seconds{scrape_job=~\"$environment\"})"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q5"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 5,
+          "links": [],
+          "title": "Oldest Pending Job",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(increase(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__range])) or vector(0)"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q6"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "Failed Jobs (range)",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval]))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q7"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 7,
+          "links": [],
+          "title": "Dispatched /s",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "ops"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q8"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 8,
+          "links": [],
+          "title": "Processed /s",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "ops"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_pending_jobs{scrape_job=~\"$environment\"}) / clamp_min(sum(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[5m])), 0.001)"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q9"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Pending jobs divided by current processed rate",
+          "id": 9,
+          "links": [],
+          "title": "Backlog Drain ETA",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
       "panel-10": {
         "kind": "Panel",
         "spec": {
@@ -50,12 +716,50 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": ""
+                        "expr": "sum(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "dispatched"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q8"
+                    "refId": "Q10"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "processed"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q11"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "failed"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q12"
                   }
                 }
               ],
@@ -63,51 +767,39 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 10,
           "links": [],
-          "title": "Failed /s",
+          "title": "Job Throughput",
           "vizConfig": {
-            "group": "stat",
+            "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "value": 0.01
-                      }
-                    ]
-                  },
-                  "unit": "reqps"
+                  "unit": "short",
+                  "custom": {
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "lineWidth": 2,
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
-                "textMode": "value_and_name"
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -129,12 +821,31 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "count(count by (queue)(app_queue_size{scrape_job=\"production-metrics-scrape\"}))",
-                        "legendFormat": ""
+                        "expr": "sum by (queue)(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "dispatched {{queue}}"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q9"
+                    "refId": "Q13"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum by (queue)(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "processed {{queue}}"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q14"
                   }
                 }
               ],
@@ -142,47 +853,106 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 11,
           "links": [],
-          "title": "Active Queues",
+          "title": "Dispatched vs Processed by Queue",
           "vizConfig": {
-            "group": "stat",
+            "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "short"
+                  "unit": "short",
+                  "custom": {
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "lineWidth": 2,
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
-                "textMode": "value_and_name"
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum by (queue)(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval])) - sum by (queue)(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "{{queue}}"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q15"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Positive = backlog growing",
+          "id": 12,
+          "links": [],
+          "title": "Dispatch \u2212 Process Imbalance by Queue",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "custom": {
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "lineWidth": 2,
+                    "showPoints": "never"
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -204,50 +974,12 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(app_jobs_dispatched_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "dispatched"
+                        "expr": "sum by (queue)(app_queue_size{scrape_job=~\"$environment\"})",
+                        "legendFormat": "{{queue}}"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q10"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "processed"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q11"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "failed"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q12"
+                    "refId": "Q16"
                   }
                 }
               ],
@@ -255,36 +987,31 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 13,
           "links": [],
-          "title": "Job Throughput (dispatched / processed / failed)",
+          "title": "Queue Size by Queue",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "unit": "short",
                   "custom": {
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "reqps"
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
                 "tooltip": {
                   "mode": "multi",
@@ -292,7 +1019,7 @@
                 }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -314,12 +1041,12 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_dispatched_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "dispatched: {{queue}}"
+                        "expr": "sum(app_queue_pending_jobs{scrape_job=~\"$environment\"})",
+                        "legendFormat": "pending"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q13"
+                    "refId": "Q17"
                   }
                 },
                 {
@@ -333,12 +1060,31 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_processed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "processed: {{queue}}"
+                        "expr": "sum(app_queue_reserved_jobs{scrape_job=~\"$environment\"})",
+                        "legendFormat": "reserved"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q14"
+                    "refId": "Q18"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(app_queue_delayed_jobs{scrape_job=~\"$environment\"})",
+                        "legendFormat": "delayed"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q19"
                   }
                 }
               ],
@@ -346,36 +1092,31 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 14,
           "links": [],
-          "title": "Dispatched vs Processed by Queue",
+          "title": "Pending / Reserved / Delayed",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "unit": "short",
                   "custom": {
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "reqps"
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
                 "tooltip": {
                   "mode": "multi",
@@ -383,7 +1124,74 @@
                 }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
+          }
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "max by (queue)(app_queue_oldest_pending_job_age_seconds{scrape_job=~\"$environment\"})",
+                        "legendFormat": "{{queue}}"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q20"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 15,
+          "links": [],
+          "title": "Oldest Pending Job Age by Queue",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "lineWidth": 2,
+                    "showPoints": "never"
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -405,12 +1213,12 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(app_queue_size{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "{{queue}}"
+                        "expr": "sum by (job_class)(rate(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "{{job_class}}"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q15"
+                    "refId": "Q21"
                   }
                 }
               ],
@@ -418,36 +1226,31 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 16,
           "links": [],
-          "title": "Queue Depth (size) by Queue",
+          "title": "Job Failures by Class",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "unit": "short",
                   "custom": {
                     "drawStyle": "line",
-                    "fillOpacity": 20,
+                    "fillOpacity": 10,
                     "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "normal"
-                    }
-                  },
-                  "unit": "short"
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
                 "tooltip": {
                   "mode": "multi",
@@ -455,7 +1258,7 @@
                 }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -477,50 +1280,12 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(app_queue_pending_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "pending"
+                        "expr": "sum by (exception_class)(rate(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "legendFormat": "{{exception_class}}"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q16"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(app_queue_reserved_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "reserved"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q17"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(app_queue_delayed_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "delayed"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q18"
+                    "refId": "Q22"
                   }
                 }
               ],
@@ -528,36 +1293,31 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 17,
           "links": [],
-          "title": "Pending / Reserved / Delayed (total)",
+          "title": "Job Failures by Exception",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "unit": "short",
                   "custom": {
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "short"
+                    "showPoints": "never"
+                  }
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
                 },
                 "tooltip": {
                   "mode": "multi",
@@ -565,7 +1325,7 @@
                 }
               }
             },
-            "version": ""
+            "version": "13.2.0-30402795349"
           }
         }
       },
@@ -587,12 +1347,12 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(app_queue_pending_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "{{queue}}"
+                        "expr": "topk(15, sum by (job_class)(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "legendFormat": "processed/s"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q19"
+                    "refId": "Q23"
                   }
                 }
               ],
@@ -600,41 +1360,24 @@
               "transformations": []
             }
           },
+          "description": "",
           "id": 18,
           "links": [],
-          "title": "Pending Jobs by Queue",
+          "title": "Top Job Classes by Throughput",
           "vizConfig": {
-            "group": "timeseries",
+            "group": "table",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
                   "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "short"
+                    "align": "auto"
+                  }
                 },
                 "overrides": []
               },
               "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
+                "showHeader": true
               }
             },
             "version": ""
@@ -659,514 +1402,21 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "max by (queue)(app_queue_oldest_pending_job_age_seconds{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": "{{queue}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q20"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 19,
-          "links": [],
-          "title": "Oldest Pending Job Age by Queue",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "s"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-2": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(app_queue_size{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q0"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 2,
-          "links": [],
-          "title": "Queue Size (total)",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "short"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-21": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (job_class)(rate(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "{{job_class}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q21"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 21,
-          "links": [],
-          "title": "Job Failures by Class",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-22": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (exception_class)(rate(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": "{{exception_class}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q22"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 22,
-          "links": [],
-          "title": "Job Failures by Exception",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineWidth": 2,
-                    "showPoints": "never",
-                    "stacking": {
-                      "mode": "none"
-                    }
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-24": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (queue)(app_queue_size{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q23"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (queue)(app_queue_pending_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
+                        "expr": "topk(15, sum by (job_class)(increase(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__range])))",
+                        "legendFormat": "failures"
                       },
                       "version": "v0"
                     },
                     "refId": "Q24"
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (queue)(app_queue_reserved_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q25"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (queue)(app_queue_delayed_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q26"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max by (queue)(app_queue_oldest_pending_job_age_seconds{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q27"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_processed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q28"
-                  }
                 }
               ],
               "queryOptions": {},
               "transformations": []
             }
           },
-          "id": 24,
-          "links": [],
-          "title": "Per-Queue Summary",
-          "vizConfig": {
-            "group": "table",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "align": "auto"
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "showHeader": true
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-25": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "topk(15, sum by (job_class)(rate(app_jobs_processed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval])))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q29"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 25,
-          "links": [],
-          "title": "Top Job Classes by Throughput (processed/s)",
-          "vizConfig": {
-            "group": "table",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "align": "auto"
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "showHeader": true
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-26": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "topk(15, sum by (job_class)(increase(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__range])))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q30"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 26,
+          "description": "",
+          "id": 19,
           "links": [],
           "title": "Top Job Classes by Failures (range)",
           "vizConfig": {
@@ -1189,7 +1439,7 @@
           }
         }
       },
-      "panel-3": {
+      "panel-20": {
         "kind": "Panel",
         "spec": {
           "data": {
@@ -1202,17 +1452,17 @@
                     "hidden": false,
                     "query": {
                       "datasource": {
-                        "name": "grafanacloud-prom"
+                        "name": "grafanacloud-logs"
                       },
-                      "group": "prometheus",
+                      "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(app_queue_pending_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
+                        "expr": "{service_name=\"shop-api\"} |= \"job.failed\"",
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
-                    "refId": "Q1"
+                    "refId": "Q25"
                   }
                 }
               ],
@@ -1220,517 +1470,27 @@
               "transformations": []
             }
           },
-          "id": 3,
+          "description": "",
+          "id": 20,
           "links": [],
-          "title": "Pending Jobs",
+          "title": "Recent Job Failures",
           "vizConfig": {
-            "group": "stat",
+            "group": "logs",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 100
-                      },
-                      {
-                        "color": "red",
-                        "value": 1000
-                      }
-                    ]
-                  },
-                  "unit": "short"
-                },
+                "defaults": {},
                 "overrides": []
               },
               "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
+                "dedupStrategy": "none",
+                "enableLogDetails": true,
+                "showTime": true,
+                "sortOrder": "Descending",
+                "wrapLogMessage": true
               }
             },
-            "version": ""
-          }
-        }
-      },
-      "panel-4": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(app_queue_reserved_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q2"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 4,
-          "links": [],
-          "title": "Reserved Jobs",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "short"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-5": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(app_queue_delayed_jobs{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q3"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 5,
-          "links": [],
-          "title": "Delayed Jobs",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "short"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-6": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max(app_queue_oldest_pending_job_age_seconds{scrape_job=\"production-metrics-scrape\"})",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q4"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 6,
-          "links": [],
-          "title": "Oldest Pending Job",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 60
-                      },
-                      {
-                        "color": "red",
-                        "value": 300
-                      }
-                    ]
-                  },
-                  "unit": "s"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-7": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(increase(app_jobs_failed_total{scrape_job=\"production-metrics-scrape\"}[$__range])) or vector(0)",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q5"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 7,
-          "links": [],
-          "title": "Failed Jobs (range)",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "value": 1
-                      }
-                    ]
-                  },
-                  "unit": "short"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-8": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_jobs_dispatched_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q6"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 8,
-          "links": [],
-          "title": "Dispatched /s",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-9": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=\"production-metrics-scrape\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q7"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "id": 9,
-          "links": [],
-          "title": "Processed /s",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "textMode": "value_and_name"
-              }
-            },
-            "version": ""
+            "version": "13.2.0-30402795349"
           }
         }
       }
@@ -1752,7 +1512,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-2"
+                          "name": "panel-1"
                         },
                         "height": 4,
                         "width": 4,
@@ -1765,7 +1525,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-3"
+                          "name": "panel-2"
                         },
                         "height": 4,
                         "width": 4,
@@ -1778,7 +1538,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-4"
+                          "name": "panel-3"
                         },
                         "height": 4,
                         "width": 4,
@@ -1791,7 +1551,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-5"
+                          "name": "panel-4"
                         },
                         "height": 4,
                         "width": 4,
@@ -1804,7 +1564,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-6"
+                          "name": "panel-5"
                         },
                         "height": 4,
                         "width": 4,
@@ -1817,7 +1577,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-7"
+                          "name": "panel-6"
                         },
                         "height": 4,
                         "width": 4,
@@ -1830,11 +1590,24 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-7"
+                        },
+                        "height": 4,
+                        "width": 4,
+                        "x": 0,
+                        "y": 4
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-8"
                         },
                         "height": 4,
-                        "width": 6,
-                        "x": 0,
+                        "width": 4,
+                        "x": 4,
                         "y": 4
                       }
                     },
@@ -1846,11 +1619,25 @@
                           "name": "panel-9"
                         },
                         "height": 4,
-                        "width": 6,
-                        "x": 6,
+                        "width": 4,
+                        "x": 8,
                         "y": 4
                       }
-                    },
+                    }
+                  ]
+                }
+              },
+              "title": "Queue Health Overview"
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
@@ -1858,10 +1645,10 @@
                           "kind": "ElementReference",
                           "name": "panel-10"
                         },
-                        "height": 4,
-                        "width": 6,
-                        "x": 12,
-                        "y": 4
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
                       }
                     },
                     {
@@ -1871,16 +1658,29 @@
                           "kind": "ElementReference",
                           "name": "panel-11"
                         },
-                        "height": 4,
-                        "width": 6,
-                        "x": 18,
-                        "y": 4
+                        "height": 8,
+                        "width": 12,
+                        "x": 0,
+                        "y": 8
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        },
+                        "height": 8,
+                        "width": 12,
+                        "x": 12,
+                        "y": 8
                       }
                     }
                   ]
                 }
               },
-              "title": "Queue Health Overview"
+              "title": "Throughput"
             }
           },
           {
@@ -1916,11 +1716,24 @@
                         "x": 12,
                         "y": 0
                       }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-15"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 8
+                      }
                     }
                   ]
                 }
               },
-              "title": "Throughput \u0026 Processing"
+              "title": "Queue Depth"
             }
           },
           {
@@ -1964,8 +1777,8 @@
                           "kind": "ElementReference",
                           "name": "panel-18"
                         },
-                        "height": 8,
-                        "width": 12,
+                        "height": 10,
+                        "width": 24,
                         "x": 0,
                         "y": 8
                       }
@@ -1977,56 +1790,16 @@
                           "kind": "ElementReference",
                           "name": "panel-19"
                         },
-                        "height": 8,
-                        "width": 12,
-                        "x": 12,
-                        "y": 8
-                      }
-                    }
-                  ]
-                }
-              },
-              "title": "Backlog \u0026 Queue Depth"
-            }
-          },
-          {
-            "kind": "RowsLayoutRow",
-            "spec": {
-              "collapse": false,
-              "layout": {
-                "kind": "GridLayout",
-                "spec": {
-                  "items": [
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-21"
-                        },
-                        "height": 8,
-                        "width": 12,
+                        "height": 10,
+                        "width": 24,
                         "x": 0,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-22"
-                        },
-                        "height": 8,
-                        "width": 12,
-                        "x": 12,
-                        "y": 0
+                        "y": 18
                       }
                     }
                   ]
                 }
               },
-              "title": "Failures"
+              "title": "Failures & Throughput by Class"
             }
           },
           {
@@ -2042,44 +1815,18 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-24"
+                          "name": "panel-20"
                         },
-                        "height": 9,
+                        "height": 14,
                         "width": 24,
                         "x": 0,
                         "y": 0
                       }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-25"
-                        },
-                        "height": 9,
-                        "width": 12,
-                        "x": 0,
-                        "y": 9
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-26"
-                        },
-                        "height": 9,
-                        "width": 12,
-                        "x": 12,
-                        "y": 9
-                      }
                     }
                   ]
                 }
               },
-              "title": "Breakdown Tables"
+              "title": "Live Job Failure Logs"
             }
           }
         ]
@@ -2089,10 +1836,9 @@
     "liveNow": false,
     "preload": false,
     "tags": [
-      "queue",
-      "jobs",
-      "playground",
-      "app"
+      "trybe",
+      "shop-api",
+      "queues"
     ],
     "timeSettings": {
       "autoRefresh": "30s",
@@ -2114,7 +1860,44 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "Queues — Full Overview",
-    "variables": []
+    "title": "Queues & Jobs",
+    "variables": [
+      {
+        "datasource": {
+          "name": "grafanacloud-prom"
+        },
+        "group": "prometheus",
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "allValue": ".*",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "label": "Environment",
+          "multi": true,
+          "name": "environment",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "grafanacloud-prom"
+            },
+            "group": "prometheus",
+            "kind": "DataQuery",
+            "spec": {
+              "query": "label_values(app_requests_completed_total, scrape_job)"
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      }
+    ]
   }
 }
