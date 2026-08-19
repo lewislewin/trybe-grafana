@@ -2166,7 +2166,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Playground (playground-metrics-scrape)",
-        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=playground-metrics-scrape&var-service=$__all",
+        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=playground-metrics-scrape&var-service=$__all&var-deployment_environment=playground",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -2178,7 +2178,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Staging (stage-metrics-scrape)",
-        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=stage-metrics-scrape&var-service=$__all",
+        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=stage-metrics-scrape&var-service=$__all&var-deployment_environment=staging&var-deployment_environment=stage",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -2190,7 +2190,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
-        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=production-metrics-scrape&var-service=$__all",
+        "url": "/d/dbfvo1lxkhqi9sd/platform-health?var-environment=production-metrics-scrape&var-service=$__all&var-deployment_environment=production",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -2386,6 +2386,44 @@
             "kind": "DataQuery",
             "spec": {
               "label": "service_name",
+              "stream": "{service_name=~\".*shop-api\"}",
+              "type": "label_values"
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      },
+      {
+        "datasource": {
+          "name": "grafanacloud-logs"
+        },
+        "group": "loki",
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "allValue": ".*",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "label": "Deployment",
+          "multi": true,
+          "name": "deployment_environment",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "grafanacloud-logs"
+            },
+            "group": "loki",
+            "kind": "DataQuery",
+            "spec": {
+              "label": "deployment_environment",
               "stream": "{service_name=~\".*shop-api\"}",
               "type": "label_values"
             },

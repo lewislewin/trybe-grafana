@@ -467,7 +467,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, quantile_over_time(0.95, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
+                        "expr": "topk(10, quantile_over_time(0.95, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
                         "legendFormat": "{{route}}",
                         "maxLines": 100,
                         "queryType": "range"
@@ -582,7 +582,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, quantile_over_time(0.99, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
+                        "expr": "topk(10, quantile_over_time(0.99, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
                         "legendFormat": "{{route}}",
                         "maxLines": 100,
                         "queryType": "range"
@@ -697,7 +697,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "{service_name=~\"$service\"} |= \"request.server_error\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace",
+                        "expr": "{service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"request.server_error\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace",
                         "maxLines": 100,
                         "queryType": "range"
                       },
@@ -1780,7 +1780,7 @@
         "title": "Playground",
         "tooltip": "This dashboard scoped to Playground (playground-metrics-scrape)",
         "type": "link",
-        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=playground-metrics-scrape\u0026var-service=$__all"
+        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=playground-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=playground"
       },
       {
         "asDropdown": false,
@@ -1792,7 +1792,7 @@
         "title": "Staging",
         "tooltip": "This dashboard scoped to Staging (stage-metrics-scrape)",
         "type": "link",
-        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=stage-metrics-scrape\u0026var-service=$__all"
+        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=stage-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=staging\u0026var-deployment_environment=stage"
       },
       {
         "asDropdown": false,
@@ -1804,7 +1804,7 @@
         "title": "Production",
         "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
         "type": "link",
-        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=production-metrics-scrape\u0026var-service=$__all"
+        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=production-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=production"
       },
       {
         "asDropdown": false,
@@ -1988,6 +1988,41 @@
             "kind": "DataQuery",
             "spec": {
               "label": "service_name",
+              "stream": "{service_name=~\".*shop-api\"}",
+              "type": "label_values"
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allValue": ".*",
+          "allowCustomValue": true,
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "label": "Deployment",
+          "multi": true,
+          "name": "deployment_environment",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "grafanacloud-logs"
+            },
+            "group": "loki",
+            "kind": "DataQuery",
+            "spec": {
+              "label": "deployment_environment",
               "stream": "{service_name=~\".*shop-api\"}",
               "type": "label_values"
             },

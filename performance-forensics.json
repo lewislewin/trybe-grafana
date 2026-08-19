@@ -51,7 +51,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(quantile_over_time(0.50, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
+                        "expr": "sum(quantile_over_time(0.50, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "p50"
@@ -72,7 +72,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(quantile_over_time(0.95, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
+                        "expr": "sum(quantile_over_time(0.95, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "p95"
@@ -93,7 +93,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(quantile_over_time(0.99, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
+                        "expr": "sum(quantile_over_time(0.99, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "p99"
@@ -162,7 +162,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, quantile_over_time(0.95, {service_name=~\"$service\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
+                        "expr": "topk(10, quantile_over_time(0.95, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "{{route}}"
@@ -231,7 +231,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(avg_over_time({service_name=~\"$service\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
+                        "expr": "sum(avg_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "monitored"
@@ -252,7 +252,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(avg_over_time({service_name=~\"$service\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
+                        "expr": "sum(avg_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "unmonitored"
@@ -321,7 +321,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(count_over_time({service_name=~\"$service\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
+                        "expr": "sum(count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "monitored"
@@ -342,7 +342,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(count_over_time({service_name=~\"$service\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
+                        "expr": "sum(count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "unmonitored"
@@ -411,7 +411,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
+                        "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "{{route}}"
@@ -480,7 +480,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\"} |= \"request.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
+                        "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"request.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "{{route}}"
@@ -549,7 +549,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(15, sum by (query_pattern) (count_over_time({service_name=~\"$service\"} |= \"query.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
+                        "expr": "topk(15, sum by (query_pattern) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
                         "queryType": "range",
                         "maxLines": 100,
                         "legendFormat": "count"
@@ -606,7 +606,7 @@
                       "group": "loki",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "{service_name=~\"$service\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace",
+                        "expr": "{service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace",
                         "queryType": "range",
                         "maxLines": 100
                       },
@@ -804,7 +804,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Playground (playground-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=playground-metrics-scrape&var-service=$__all",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=playground-metrics-scrape&var-service=$__all&var-deployment_environment=playground",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -816,7 +816,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Staging (stage-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=stage-metrics-scrape&var-service=$__all",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=stage-metrics-scrape&var-service=$__all&var-deployment_environment=staging&var-deployment_environment=stage",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -828,7 +828,7 @@
         "type": "link",
         "icon": "cloud",
         "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=production-metrics-scrape&var-service=$__all",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=production-metrics-scrape&var-service=$__all&var-deployment_environment=production",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -1024,6 +1024,44 @@
             "kind": "DataQuery",
             "spec": {
               "label": "service_name",
+              "stream": "{service_name=~\".*shop-api\"}",
+              "type": "label_values"
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      },
+      {
+        "datasource": {
+          "name": "grafanacloud-logs"
+        },
+        "group": "loki",
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "allValue": ".*",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "label": "Deployment",
+          "multi": true,
+          "name": "deployment_environment",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "grafanacloud-logs"
+            },
+            "group": "loki",
+            "kind": "DataQuery",
+            "spec": {
+              "label": "deployment_environment",
               "stream": "{service_name=~\".*shop-api\"}",
               "type": "label_values"
             },

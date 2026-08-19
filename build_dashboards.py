@@ -22,11 +22,12 @@ UID_SITE = "trybe-site-health"
 UID_FORENSICS = "trybe-performance-forensics"
 UID_ERRORS = "trybe-errors-exceptions"
 
-# scrape_job values as they appear on grafanacloud-prom. Staging is stage-, not staging-.
+# (title, Prometheus scrape_job, Loki deployment_environment / APP_ENV)
+# Staging scrape job is stage-; APP_ENV may be staging or stage.
 ENVIRONMENTS = (
-    ("Playground", "playground-metrics-scrape"),
-    ("Staging", "stage-metrics-scrape"),
-    ("Production", "production-metrics-scrape"),
+    ("Playground", "playground-metrics-scrape", ("playground",)),
+    ("Staging", "stage-metrics-scrape", ("staging", "stage")),
+    ("Production", "production-metrics-scrape", ("production",)),
 )
 
 # Drop high-cardinality stream labels before unwrap / count_over_time so Loki
@@ -44,7 +45,7 @@ def env(**labels: str) -> str:
 
 
 def loki_stream() -> str:
-    return '{service_name=~"$service"}'
+    return '{service_name=~"$service", deployment_environment=~"$deployment_environment"}'
 
 
 def loki_event(event: str, extra: str = "") -> str:
@@ -435,6 +436,40 @@ def service_variable() -> dict[str, Any]:
     }
 
 
+def deployment_environment_variable() -> dict[str, Any]:
+    return {
+        "datasource": {"name": LOKI},
+        "group": "loki",
+        "kind": "QueryVariable",
+        "spec": {
+            "allowCustomValue": True,
+            "allValue": ".*",
+            "current": {"text": "All", "value": "$__all"},
+            "hide": "dontHide",
+            "includeAll": True,
+            "label": "Deployment",
+            "multi": True,
+            "name": "deployment_environment",
+            "options": [],
+            "query": {
+                "datasource": {"name": LOKI},
+                "group": "loki",
+                "kind": "DataQuery",
+                "spec": {
+                    "label": "deployment_environment",
+                    "stream": '{service_name=~".*shop-api"}',
+                    "type": "label_values",
+                },
+                "version": "v0",
+            },
+            "refresh": "onDashboardLoad",
+            "regex": "",
+            "skipUrlSync": False,
+            "sort": "alphabeticalAsc",
+        },
+    }
+
+
 def site_id_variable() -> dict[str, Any]:
     return {
         "datasource": {"name": LOKI},
@@ -456,7 +491,7 @@ def site_id_variable() -> dict[str, Any]:
                 "kind": "DataQuery",
                 "spec": {
                     "label": "site_id",
-                    "stream": '{service_name=~"$service"}',
+                    "stream": loki_stream(),
                     "type": "label_values",
                 },
                 "version": "v0",
@@ -470,7 +505,7 @@ def site_id_variable() -> dict[str, Any]:
 
 
 def default_variables() -> list[dict[str, Any]]:
-    return [environment_variable(), service_variable()]
+    return [environment_variable(), service_variable(), deployment_environment_variable()]
 
 
 def uid_link(title: str, uid: str) -> dict[str, Any]:
@@ -501,13 +536,20 @@ def grafana_slug(title: str) -> str:
     return "".join(parts)
 
 
-def env_link(title: str, scrape_job: str, uid: str, slug: str) -> dict[str, Any]:
+def env_link(
+    title: str,
+    scrape_job: str,
+    uid: str,
+    slug: str,
+    deployment_envs: tuple[str, ...],
+) -> dict[str, Any]:
+    dep_qs = "&".join(f"var-deployment_environment={value}" for value in deployment_envs)
     return {
         "title": title,
         "type": "link",
         "icon": "cloud",
         "tooltip": f"This dashboard scoped to {title} ({scrape_job})",
-        "url": f"/d/{uid}/{slug}?var-environment={scrape_job}&var-service=$__all",
+        "url": f"/d/{uid}/{slug}?var-environment={scrape_job}&var-service=$__all&{dep_qs}",
         "tags": [],
         "asDropdown": False,
         "targetBlank": False,
@@ -518,7 +560,7 @@ def env_link(title: str, scrape_job: str, uid: str, slug: str) -> dict[str, Any]
 
 def shared_links(uid: str, title: str) -> list[dict[str, Any]]:
     slug = grafana_slug(title)
-    env_links = [env_link(name, job, uid, slug) for name, job in ENVIRONMENTS]
+    env_links = [env_link(name, job, uid, slug, dep_envs) for name, job, dep_envs in ENVIRONMENTS]
     nav = [
         uid_link("Platform Health", UID_PLATFORM),
         uid_link("Requests — Full Overview", UID_REQUESTS),
