@@ -12,6 +12,32 @@ LOKI = "grafanacloud-logs"
 VIZ_VERSION = "13.2.0-30402795349"
 OUT = Path(__file__).parent
 
+UID_PLATFORM = "dbfvo1lxkhqi9sd"
+UID_REQUESTS = "ddfvo1r1k0xczka"
+UID_QUEUES = "dffvo1phlivqwwc"
+UID_REDIS = "trybe-redis-valkey"
+UID_COMMERCE = "trybe-commerce-funnel"
+UID_SITE = "trybe-site-health"
+UID_FORENSICS = "trybe-performance-forensics"
+UID_ERRORS = "trybe-errors-exceptions"
+
+# scrape_job → Loki service_name. Staging is staging-shop-api; others follow {env}-shop-api
+# except local (plain shop-api).
+ENVIRONMENTS = (
+    ("Playground", "playground-metrics-scrape", "playground-shop-api"),
+    ("Staging", "staging-metrics-scrape", "staging-shop-api"),
+    ("Production", "production-metrics-scrape", "production-shop-api"),
+    ("Local", "local-metrics-scrape", "shop-api"),
+)
+
+# Drop high-cardinality stream labels before unwrap / count_over_time so Loki
+# stays under the 500-series metric query cap.
+LOKI_DROP = (
+    "instance, k8s_pod_name, k8s_container_name, exported_instance, "
+    "detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, "
+    "telemetry_sdk_version, service_version, service_namespace"
+)
+
 
 def env(**labels: str) -> str:
     parts = ['scrape_job=~"$environment"'] + [f'{k}="{v}"' for k, v in labels.items()]
@@ -19,14 +45,18 @@ def env(**labels: str) -> str:
 
 
 def loki_stream() -> str:
-    return '{service_name="shop-api"}'
+    return '{service_name=~"$service"}'
 
 
 def loki_event(event: str, extra: str = "") -> str:
     q = f'{loki_stream()} |= "{event}"'
     if extra:
         q += f" {extra}"
-    return q
+    return f"{q} | drop {LOKI_DROP}"
+
+
+def loki_unwrap(event: str, field: str = "duration_ms", extra: str = "") -> str:
+    return f"{loki_event(event, extra)} | unwrap {field}"
 
 
 class DashboardBuilder:
@@ -65,6 +95,7 @@ class DashboardBuilder:
         spec: dict[str, Any] = {
             "expr": expr,
             "queryType": "instant" if instant else "range",
+            "maxLines": 100,
         }
         if legend is not None:
             spec["legendFormat"] = legend
@@ -371,6 +402,40 @@ def environment_variable() -> dict[str, Any]:
     }
 
 
+def service_variable() -> dict[str, Any]:
+    return {
+        "datasource": {"name": LOKI},
+        "group": "loki",
+        "kind": "QueryVariable",
+        "spec": {
+            "allowCustomValue": True,
+            "allValue": ".*shop-api",
+            "current": {"text": "All", "value": "$__all"},
+            "hide": "dontHide",
+            "includeAll": True,
+            "label": "Service",
+            "multi": True,
+            "name": "service",
+            "options": [],
+            "query": {
+                "datasource": {"name": LOKI},
+                "group": "loki",
+                "kind": "DataQuery",
+                "spec": {
+                    "label": "service_name",
+                    "stream": '{service_name=~".*shop-api"}',
+                    "type": "label_values",
+                },
+                "version": "v0",
+            },
+            "refresh": "onDashboardLoad",
+            "regex": "",
+            "skipUrlSync": False,
+            "sort": "alphabeticalAsc",
+        },
+    }
+
+
 def site_id_variable() -> dict[str, Any]:
     return {
         "datasource": {"name": LOKI},
@@ -392,7 +457,7 @@ def site_id_variable() -> dict[str, Any]:
                 "kind": "DataQuery",
                 "spec": {
                     "label": "site_id",
-                    "stream": '{service_name="shop-api"}',
+                    "stream": '{service_name=~"$service"}',
                     "type": "label_values",
                 },
                 "version": "v0",
@@ -405,18 +470,53 @@ def site_id_variable() -> dict[str, Any]:
     }
 
 
-def dashboard_link(title: str, tags: list[str]) -> dict[str, Any]:
+def default_variables() -> list[dict[str, Any]]:
+    return [environment_variable(), service_variable()]
+
+
+def uid_link(title: str, uid: str) -> dict[str, Any]:
     return {
         "title": title,
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": title,
-        "tags": tags,
+        "url": f"/d/{uid}",
+        "tags": [],
         "asDropdown": False,
         "targetBlank": False,
         "includeVars": True,
         "keepTime": True,
     }
+
+
+def env_link(title: str, scrape_job: str, service: str) -> dict[str, Any]:
+    return {
+        "title": title,
+        "type": "link",
+        "icon": "cloud",
+        "tooltip": f"Scope this dashboard to {title} ({scrape_job} / {service})",
+        "url": f"?var-environment={scrape_job}&var-service={service}",
+        "tags": [],
+        "asDropdown": False,
+        "targetBlank": False,
+        "includeVars": False,
+        "keepTime": True,
+    }
+
+
+def shared_links() -> list[dict[str, Any]]:
+    env_links = [env_link(title, job, service) for title, job, service in ENVIRONMENTS]
+    nav = [
+        uid_link("Platform Health", UID_PLATFORM),
+        uid_link("Requests — Full Overview", UID_REQUESTS),
+        uid_link("Queues & Jobs", UID_QUEUES),
+        uid_link("Redis / Valkey", UID_REDIS),
+        uid_link("Commerce Funnel", UID_COMMERCE),
+        uid_link("Site Health", UID_SITE),
+        uid_link("Performance Forensics", UID_FORENSICS),
+        uid_link("Errors & Exceptions", UID_ERRORS),
+    ]
+    return env_links + nav
 
 
 def build_dashboard(
@@ -461,7 +561,7 @@ def build_dashboard(
             "editable": True,
             "elements": builder.elements,
             "layout": builder.layout(rows),
-            "links": links or [],
+            "links": links if links is not None else shared_links(),
             "liveNow": False,
             "preload": False,
             "tags": tags,
@@ -475,7 +575,7 @@ def build_dashboard(
                 "to": "now",
             },
             "title": title,
-            "variables": variables or [environment_variable()],
+            "variables": variables or default_variables(),
         },
     }
 
@@ -533,23 +633,12 @@ def build_platform_health() -> dict[str, Any]:
         b.stat("Metrics APCu Enabled", "app_metrics_apcu_enabled", unit="short", decimals=0, description="1 = counter aggregation via APCu is active on this scrape target"),
     ]
 
-    links = [
-        dashboard_link("API Requests", ["requests"]),
-        dashboard_link("Queues & Jobs", ["queues"]),
-        dashboard_link("Redis / Valkey", ["redis"]),
-        dashboard_link("Commerce Funnel", ["commerce"]),
-        dashboard_link("Site Health", ["logs"]),
-        dashboard_link("Performance Forensics", ["forensics"]),
-        dashboard_link("Errors & Exceptions", ["errors"]),
-    ]
-
     return build_dashboard(
-        uid="dbfvo1lxkhqi9sd",
+        uid=UID_PLATFORM,
         title="Platform Health",
         description="One-screen shop-api health: API golden signals, queue depth, Redis, checkout funnel, and metrics pipeline status.",
-        tags=["trybe", "shop-api", "overview"],
+        tags=["trybe", "shop-api", "trybe-overview"],
         builder=b,
-        links=links,
         rows=[
             ("Golden Signals — API Health", place_row(stats)),
             ("Traffic & Latency", place_row(charts)),
@@ -585,10 +674,10 @@ def build_redis() -> dict[str, Any]:
     ]
 
     return build_dashboard(
-        uid="trybe-redis-valkey",
+        uid=UID_REDIS,
         title="Redis / Valkey",
         description="Live Redis INFO from /shop/internal/metrics — hits, misses, memory, clients, evictions, and ops/sec.",
-        tags=["trybe", "shop-api", "redis"],
+        tags=["trybe", "shop-api", "trybe-redis"],
         builder=b,
         rows=[
             ("Redis Health", place_row(stats)),
@@ -613,12 +702,12 @@ def build_requests() -> dict[str, Any]:
     ]
 
     return build_dashboard(
-        uid="ddfvo1r1k0xczka",
-        title="API Requests",
+        uid=UID_REQUESTS,
+        title="Requests — Full Overview",
         description="HTTP request rates, error classes, latency by route, and Loki-backed p95/p99 where Prometheus averages fall short.",
-        tags=["trybe", "shop-api", "requests"],
+        tags=["trybe", "shop-api", "trybe-requests"],
         builder=b,
-        time_from="now-6h",
+        time_from="now-1h",
         rows=[
             ("Request Health Overview", place_row(stats)),
             ("Traffic & Errors Over Time", place_row([
@@ -639,8 +728,8 @@ def build_requests() -> dict[str, Any]:
                 b.timeseries("Busiest Routes (req/s)", [(f'topk(10, sum by (route)(rate(app_requests_completed_total{e()}[{ri}])))', "{{route}}")], unit="reqps", width=12, height=8),
             ])),
             ("Loki Latency Percentiles", place_row([
-                b.timeseries("p95 Latency by Route", [(f'quantile_over_time(0.95, {loki_event("query.monitor_active")} | unwrap duration_ms [5m]) by (route)', "{{route}}")], loki=True, unit="ms", width=12),
-                b.timeseries("p99 Latency by Route", [(f'quantile_over_time(0.99, {loki_event("query.monitor_active")} | unwrap duration_ms [5m]) by (route)', "{{route}}")], loki=True, unit="ms", width=12),
+                b.timeseries("p95 Latency by Route", [(f'topk(10, quantile_over_time(0.95, {loki_unwrap("query.monitor_active")} [5m]) by (route))', "{{route}}")], loki=True, unit="ms", width=12),
+                b.timeseries("p99 Latency by Route", [(f'topk(10, quantile_over_time(0.99, {loki_unwrap("query.monitor_active")} [5m]) by (route))', "{{route}}")], loki=True, unit="ms", width=12),
             ])),
             ("Live 5xx Logs", place_row([b.logs("Recent Server Errors", loki_event("request.server_error"), height=14)])),
         ],
@@ -665,10 +754,10 @@ def build_queues() -> dict[str, Any]:
     ]
 
     return build_dashboard(
-        uid="dffvo1phlivqwwc",
+        uid=UID_QUEUES,
         title="Queues & Jobs",
         description="SQS queue depth, job throughput, failures by class/exception, and dispatch-vs-process imbalance.",
-        tags=["trybe", "shop-api", "queues"],
+        tags=["trybe", "shop-api", "trybe-queues"],
         builder=b,
         time_from="now-6h",
         rows=[
@@ -726,10 +815,10 @@ def build_commerce() -> dict[str, Any]:
     ]
 
     return build_dashboard(
-        uid="trybe-commerce-funnel",
+        uid=UID_COMMERCE,
         title="Commerce Funnel",
         description="Checkout funnel from basket creation through submission, including failure arms and product-line events.",
-        tags=["trybe", "shop-api", "commerce"],
+        tags=["trybe", "shop-api", "trybe-commerce"],
         builder=b,
         rows=[
             ("Checkout Funnel", place_row(stats)),
@@ -761,27 +850,27 @@ def build_site_health() -> dict[str, Any]:
     site_filter = '| site_id=~"$site_id"'
 
     return build_dashboard(
-        uid="trybe-site-health",
+        uid=UID_SITE,
         title="Site Health",
         description="Per-site breakdowns from structured Loki logs — only available when site_id is present in event context.",
-        tags=["trybe", "shop-api", "logs"],
+        tags=["trybe", "shop-api", "trybe-logs"],
         builder=b,
-        variables=[environment_variable(), site_id_variable()],
+        variables=[*default_variables(), site_id_variable()],
         rows=[
             ("Basket Activity by Site", place_row([
-                b.timeseries("Top Sites — Baskets Created", [(f'sum by (site_id) (count_over_time({loki_event("basket.created")}{site_filter} [5m]))', "{{site_id}}")], loki=True, width=12),
-                b.timeseries("Top Sites — Baskets Submitted", [(f'sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [5m]))', "{{site_id}}")], loki=True, width=12),
+                b.timeseries("Top Sites — Baskets Created", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("basket.created")}{site_filter} [5m])))', "{{site_id}}")], loki=True, width=12),
+                b.timeseries("Top Sites — Baskets Submitted", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [5m])))', "{{site_id}}")], loki=True, width=12),
             ])),
             ("Checkout & Reliability by Site", place_row([
                 b.timeseries("Broken Checkout Detector", [
-                    (f'sum by (site_id) (count_over_time({loki_event("basket.created")}{site_filter} [1h])) - sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [1h]))', "{{site_id}}"),
+                    (f'topk(15, sum by (site_id) (count_over_time({loki_event("basket.created")}{site_filter} [1h])) - sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [1h])))', "{{site_id}}"),
                 ], loki=True, description="Positive gap = created but not submitted in the last hour", width=12),
-                b.timeseries("Per-site Conversion Proxy /h", [(f'sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [1h]))', "{{site_id}}")], loki=True, width=12),
+                b.timeseries("Per-site Conversion Proxy /h", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("basket.submitted")}{site_filter} [1h])))', "{{site_id}}")], loki=True, width=12),
             ])),
             ("Errors & Payments by Site", place_row([
-                b.timeseries("Per-site 5xx Events", [(f'sum by (site_id) (count_over_time({loki_event("request.server_error")}{site_filter} [5m]))', "{{site_id}}")], loki=True, width=12),
-                b.timeseries("Per-site Payment Failures", [(f'sum by (site_id) (count_over_time({loki_event("payment.failed")}{site_filter} [5m]))', "{{site_id}}")], loki=True, width=12),
-                b.timeseries("Per-site Submit Failures", [(f'sum by (site_id) (count_over_time({loki_event("basket.submit_failed")}{site_filter} [5m]))', "{{site_id}}")], loki=True, width=24),
+                b.timeseries("Per-site 5xx Events", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("request.server_error")}{site_filter} [5m])))', "{{site_id}}")], loki=True, width=12),
+                b.timeseries("Per-site Payment Failures", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("payment.failed")}{site_filter} [5m])))', "{{site_id}}")], loki=True, width=12),
+                b.timeseries("Per-site Submit Failures", [(f'topk(15, sum by (site_id) (count_over_time({loki_event("basket.submit_failed")}{site_filter} [5m])))', "{{site_id}}")], loki=True, width=24),
             ])),
         ],
     )
@@ -791,34 +880,34 @@ def build_forensics() -> dict[str, Any]:
     b = DashboardBuilder()
 
     return build_dashboard(
-        uid="trybe-performance-forensics",
+        uid=UID_FORENSICS,
         title="Performance Forensics",
         description="Query monitor findings: N+1 patterns, slow queries, latency percentiles, and monitored-vs-unmonitored A/B overhead.",
-        tags=["trybe", "shop-api", "forensics"],
+        tags=["trybe", "shop-api", "trybe-forensics"],
         builder=b,
-        time_from="now-6h",
+        time_from="now-1h",
         rows=[
             ("Latency Percentiles (Loki)", place_row([
                 b.timeseries("p50 / p95 / p99 — All Routes", [
-                    (f'quantile_over_time(0.50, {loki_event("query.monitor_active")} | unwrap duration_ms [5m])', "p50"),
-                    (f'quantile_over_time(0.95, {loki_event("query.monitor_active")} | unwrap duration_ms [5m])', "p95"),
-                    (f'quantile_over_time(0.99, {loki_event("query.monitor_active")} | unwrap duration_ms [5m])', "p99"),
+                    (f'sum(quantile_over_time(0.50, {loki_unwrap("query.monitor_active")} [5m]))', "p50"),
+                    (f'sum(quantile_over_time(0.95, {loki_unwrap("query.monitor_active")} [5m]))', "p95"),
+                    (f'sum(quantile_over_time(0.99, {loki_unwrap("query.monitor_active")} [5m]))', "p99"),
                 ], loki=True, unit="ms", width=24),
-                b.timeseries("p95 by Route", [(f'quantile_over_time(0.95, {loki_event("query.monitor_active")} | unwrap duration_ms [5m]) by (route)', "{{route}}")], loki=True, unit="ms", width=24, height=10),
+                b.timeseries("p95 by Route", [(f'topk(10, quantile_over_time(0.95, {loki_unwrap("query.monitor_active")} [5m]) by (route))', "{{route}}")], loki=True, unit="ms", width=24, height=10),
             ])),
             ("Query Monitor A/B", place_row([
                 b.timeseries("Avg Latency — Monitored vs Unmonitored", [
-                    (f'avg_over_time({loki_event("query.monitor_active")} | active="true" | unwrap duration_ms [5m])', "monitored"),
-                    (f'avg_over_time({loki_event("query.monitor_active")} | active="false" | unwrap duration_ms [5m])', "unmonitored"),
+                    (f'sum(avg_over_time({loki_unwrap("query.monitor_active", extra="| active=\"true\"")} [5m]))', "monitored"),
+                    (f'sum(avg_over_time({loki_unwrap("query.monitor_active", extra="| active=\"false\"")} [5m]))', "unmonitored"),
                 ], loki=True, unit="ms", width=12, description="Confirms sample fraction and overhead of query monitoring"),
                 b.timeseries("Request Volume — Monitored vs Unmonitored", [
-                    (f'sum(count_over_time({loki_event("query.monitor_active")} | active="true" [5m]))', "monitored"),
-                    (f'sum(count_over_time({loki_event("query.monitor_active")} | active="false" [5m]))', "unmonitored"),
+                    (f'sum(count_over_time({loki_event("query.monitor_active", extra="| active=\"true\"")} [5m]))', "monitored"),
+                    (f'sum(count_over_time({loki_event("query.monitor_active", extra="| active=\"false\"")} [5m]))', "unmonitored"),
                 ], loki=True, width=12),
             ])),
             ("Query Issues", place_row([
-                b.timeseries("N+1 Detections by Route", [(f'sum by (route) (count_over_time({loki_event("query.n_plus_one")} [5m]))', "{{route}}")], loki=True, width=12),
-                b.timeseries("Slow Requests by Route", [(f'sum by (route) (count_over_time({loki_event("request.slow")} [5m]))', "{{route}}")], loki=True, width=12),
+                b.timeseries("N+1 Detections by Route", [(f'topk(10, sum by (route) (count_over_time({loki_event("query.n_plus_one")} [5m])))', "{{route}}")], loki=True, width=12),
+                b.timeseries("Slow Requests by Route", [(f'topk(10, sum by (route) (count_over_time({loki_event("request.slow")} [5m])))', "{{route}}")], loki=True, width=12),
                 b.table("Top Slow Query Patterns", [(f'topk(15, sum by (query_pattern) (count_over_time({loki_event("query.slow")} [5m])))', "count")], loki=True, height=10),
                 b.logs("Recent N+1 Events", loki_event("query.n_plus_one"), height=12),
             ])),
@@ -832,10 +921,10 @@ def build_errors() -> dict[str, Any]:
     ri = "$__rate_interval"
 
     return build_dashboard(
-        uid="trybe-errors-exceptions",
+        uid=UID_ERRORS,
         title="Errors & Exceptions",
         description="5xx rates by route, exception class breakdown, and live error logs with exception messages.",
-        tags=["trybe", "shop-api", "errors"],
+        tags=["trybe", "shop-api", "trybe-errors"],
         builder=b,
         rows=[
             ("HTTP 5xx", place_row([

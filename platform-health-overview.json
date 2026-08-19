@@ -2162,13 +2162,72 @@
     },
     "links": [
       {
-        "title": "API Requests",
-        "type": "dashboards",
+        "title": "Playground",
+        "type": "link",
+        "icon": "cloud",
+        "tooltip": "Scope this dashboard to Playground (playground-metrics-scrape / playground-shop-api)",
+        "url": "?var-environment=playground-metrics-scrape&var-service=playground-shop-api",
+        "tags": [],
+        "asDropdown": false,
+        "targetBlank": false,
+        "includeVars": false,
+        "keepTime": true
+      },
+      {
+        "title": "Staging",
+        "type": "link",
+        "icon": "cloud",
+        "tooltip": "Scope this dashboard to Staging (staging-metrics-scrape / staging-shop-api)",
+        "url": "?var-environment=staging-metrics-scrape&var-service=staging-shop-api",
+        "tags": [],
+        "asDropdown": false,
+        "targetBlank": false,
+        "includeVars": false,
+        "keepTime": true
+      },
+      {
+        "title": "Production",
+        "type": "link",
+        "icon": "cloud",
+        "tooltip": "Scope this dashboard to Production (production-metrics-scrape / production-shop-api)",
+        "url": "?var-environment=production-metrics-scrape&var-service=production-shop-api",
+        "tags": [],
+        "asDropdown": false,
+        "targetBlank": false,
+        "includeVars": false,
+        "keepTime": true
+      },
+      {
+        "title": "Local",
+        "type": "link",
+        "icon": "cloud",
+        "tooltip": "Scope this dashboard to Local (local-metrics-scrape / shop-api)",
+        "url": "?var-environment=local-metrics-scrape&var-service=shop-api",
+        "tags": [],
+        "asDropdown": false,
+        "targetBlank": false,
+        "includeVars": false,
+        "keepTime": true
+      },
+      {
+        "title": "Platform Health",
+        "type": "link",
         "icon": "dashboard",
-        "tooltip": "API Requests",
-        "tags": [
-          "requests"
-        ],
+        "tooltip": "Platform Health",
+        "url": "/d/dbfvo1lxkhqi9sd",
+        "tags": [],
+        "asDropdown": false,
+        "targetBlank": false,
+        "includeVars": true,
+        "keepTime": true
+      },
+      {
+        "title": "Requests \u2014 Full Overview",
+        "type": "link",
+        "icon": "dashboard",
+        "tooltip": "Requests \u2014 Full Overview",
+        "url": "/d/ddfvo1r1k0xczka",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2176,12 +2235,11 @@
       },
       {
         "title": "Queues & Jobs",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Queues & Jobs",
-        "tags": [
-          "queues"
-        ],
+        "url": "/d/dffvo1phlivqwwc",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2189,12 +2247,11 @@
       },
       {
         "title": "Redis / Valkey",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Redis / Valkey",
-        "tags": [
-          "redis"
-        ],
+        "url": "/d/trybe-redis-valkey",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2202,12 +2259,11 @@
       },
       {
         "title": "Commerce Funnel",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Commerce Funnel",
-        "tags": [
-          "commerce"
-        ],
+        "url": "/d/trybe-commerce-funnel",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2215,12 +2271,11 @@
       },
       {
         "title": "Site Health",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Site Health",
-        "tags": [
-          "logs"
-        ],
+        "url": "/d/trybe-site-health",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2228,12 +2283,11 @@
       },
       {
         "title": "Performance Forensics",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Performance Forensics",
-        "tags": [
-          "forensics"
-        ],
+        "url": "/d/trybe-performance-forensics",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2241,12 +2295,11 @@
       },
       {
         "title": "Errors & Exceptions",
-        "type": "dashboards",
+        "type": "link",
         "icon": "dashboard",
         "tooltip": "Errors & Exceptions",
-        "tags": [
-          "errors"
-        ],
+        "url": "/d/trybe-errors-exceptions",
+        "tags": [],
         "asDropdown": false,
         "targetBlank": false,
         "includeVars": true,
@@ -2258,7 +2311,7 @@
     "tags": [
       "trybe",
       "shop-api",
-      "overview"
+      "trybe-overview"
     ],
     "timeSettings": {
       "autoRefresh": "30s",
@@ -2309,6 +2362,44 @@
             "kind": "DataQuery",
             "spec": {
               "query": "label_values(app_requests_completed_total, scrape_job)"
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      },
+      {
+        "datasource": {
+          "name": "grafanacloud-logs"
+        },
+        "group": "loki",
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "allValue": ".*shop-api",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "label": "Service",
+          "multi": true,
+          "name": "service",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "grafanacloud-logs"
+            },
+            "group": "loki",
+            "kind": "DataQuery",
+            "spec": {
+              "label": "service_name",
+              "stream": "{service_name=~\".*shop-api\"}",
+              "type": "label_values"
             },
             "version": "v0"
           },
