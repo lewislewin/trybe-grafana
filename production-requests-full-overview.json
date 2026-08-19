@@ -1802,21 +1802,9 @@
         "tags": [],
         "targetBlank": false,
         "title": "Production",
-        "tooltip": "Scope this dashboard to Production (production-metrics-scrape / production-shop-api)",
+        "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
         "type": "link",
-        "url": "?var-environment=production-metrics-scrape\u0026var-service=production-shop-api"
-      },
-      {
-        "asDropdown": false,
-        "icon": "cloud",
-        "includeVars": false,
-        "keepTime": true,
-        "tags": [],
-        "targetBlank": false,
-        "title": "Local",
-        "tooltip": "Scope this dashboard to Local (local-metrics-scrape / shop-api)",
-        "type": "link",
-        "url": "?var-environment=local-metrics-scrape\u0026var-service=shop-api"
+        "url": "/d/ddfvo1r1k0xczka/requests-e28094-full-overview?var-environment=production-metrics-scrape\u0026var-service=$__all"
       },
       {
         "asDropdown": false,

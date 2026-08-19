@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 PROM = "grafanacloud-prom"
 LOKI = "grafanacloud-logs"
@@ -21,13 +22,11 @@ UID_SITE = "trybe-site-health"
 UID_FORENSICS = "trybe-performance-forensics"
 UID_ERRORS = "trybe-errors-exceptions"
 
-# scrape_job → Loki service_name. Staging is staging-shop-api; others follow {env}-shop-api
-# except local (plain shop-api).
+# scrape_job values as they appear on grafanacloud-prom. Staging is stage-, not staging-.
 ENVIRONMENTS = (
-    ("Playground", "playground-metrics-scrape", "playground-shop-api"),
-    ("Staging", "staging-metrics-scrape", "staging-shop-api"),
-    ("Production", "production-metrics-scrape", "production-shop-api"),
-    ("Local", "local-metrics-scrape", "shop-api"),
+    ("Playground", "playground-metrics-scrape"),
+    ("Staging", "stage-metrics-scrape"),
+    ("Production", "production-metrics-scrape"),
 )
 
 # Drop high-cardinality stream labels before unwrap / count_over_time so Loki
@@ -489,13 +488,26 @@ def uid_link(title: str, uid: str) -> dict[str, Any]:
     }
 
 
-def env_link(title: str, scrape_job: str, service: str) -> dict[str, Any]:
+def grafana_slug(title: str) -> str:
+    """Match Grafana Cloud's /d/{uid}/{slug} encoding (non-ASCII → UTF-8 hex)."""
+    parts: list[str] = []
+    for ch in title:
+        if ch.isalnum():
+            parts.append(ch.lower())
+        elif ch in " -":
+            parts.append("-")
+        else:
+            parts.append(quote(ch, safe="").replace("%", "").lower())
+    return "".join(parts)
+
+
+def env_link(title: str, scrape_job: str, uid: str, slug: str) -> dict[str, Any]:
     return {
         "title": title,
         "type": "link",
         "icon": "cloud",
-        "tooltip": f"Scope this dashboard to {title} ({scrape_job} / {service})",
-        "url": f"?var-environment={scrape_job}&var-service={service}",
+        "tooltip": f"This dashboard scoped to {title} ({scrape_job})",
+        "url": f"/d/{uid}/{slug}?var-environment={scrape_job}&var-service=$__all",
         "tags": [],
         "asDropdown": False,
         "targetBlank": False,
@@ -504,8 +516,9 @@ def env_link(title: str, scrape_job: str, service: str) -> dict[str, Any]:
     }
 
 
-def shared_links() -> list[dict[str, Any]]:
-    env_links = [env_link(title, job, service) for title, job, service in ENVIRONMENTS]
+def shared_links(uid: str, title: str) -> list[dict[str, Any]]:
+    slug = grafana_slug(title)
+    env_links = [env_link(name, job, uid, slug) for name, job in ENVIRONMENTS]
     nav = [
         uid_link("Platform Health", UID_PLATFORM),
         uid_link("Requests — Full Overview", UID_REQUESTS),
@@ -561,7 +574,7 @@ def build_dashboard(
             "editable": True,
             "elements": builder.elements,
             "layout": builder.layout(rows),
-            "links": links if links is not None else shared_links(),
+            "links": links if links is not None else shared_links(uid, title),
             "liveNow": False,
             "preload": False,
             "tags": tags,
