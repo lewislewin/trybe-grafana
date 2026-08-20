@@ -533,8 +533,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "rate(app_redis_keyspace_misses_total[1m])",
-                        "legendFormat": "misses"
+                        "editorMode": "code",
+                        "expr": "rate(app_redis_keyspace_misses_total{scrape_job=~\"$environment\"}[1m])",
+                        "legendFormat": "misses",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -897,8 +899,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "app_redis_connected_clients",
-                        "legendFormat": "clients"
+                        "editorMode": "code",
+                        "expr": "app_redis_connected_clients{scrape_job=~\"$environment\"}",
+                        "legendFormat": "clients",
+                        "range": true
                       },
                       "version": "v0"
                     },
