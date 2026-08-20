@@ -128,7 +128,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "topk(20, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
-                        "legendFormat": "req/s"
+                        "format": "table",
+                        "instant": true,
+                        "range": false
                       },
                       "version": "v0"
                     },
@@ -146,8 +148,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (route)(rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001)",
-                        "legendFormat": "avg ms"
+                        "expr": "(sum by (route)(rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001)) and on(route) topk(20, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "format": "table",
+                        "instant": true,
+                        "range": false
                       },
                       "version": "v0"
                     },
@@ -165,58 +169,348 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "100 * sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\",status_class=\"5xx\"}[$__rate_interval])) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001)",
-                        "legendFormat": "5xx %"
+                        "expr": "100 * (sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\",status_class=\"4xx\"}[$__rate_interval])) or 0 * sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval]))) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001) and on(route) topk(20, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "format": "table",
+                        "instant": true,
+                        "range": false
                       },
                       "version": "v0"
                     },
                     "refId": "Q13"
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "100 * (sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\",status_class=\"5xx\"}[$__rate_interval])) or 0 * sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval]))) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001) and on(route) topk(20, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "format": "table",
+                        "instant": true,
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q14"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum by (route)(increase(app_requests_completed_total{scrape_job=~\"$environment\"}[$__range])) and on(route) topk(20, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "format": "table",
+                        "instant": true,
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q15"
+                  }
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "kind": "joinByField",
+                  "spec": {
+                    "id": "joinByField",
+                    "options": {
+                      "byField": "route",
+                      "mode": "outer"
+                    }
+                  }
+                },
+                {
+                  "kind": "filterFieldsByName",
+                  "spec": {
+                    "id": "filterFieldsByName",
+                    "options": {
+                      "exclude": {
+                        "pattern": "^Time"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "organize",
+                  "spec": {
+                    "id": "organize",
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "Value #Q11": "Req/s",
+                        "Value #Q12": "Avg latency",
+                        "Value #Q13": "4xx %",
+                        "Value #Q14": "5xx %",
+                        "Value #Q15": "Requests",
+                        "route": "Route"
+                      }
+                    }
+                  }
+                }
+              ]
             }
           },
-          "description": "",
+          "description": "One row per route for the 20 busiest routes. Latency is the mean over the selected window; 4xx/5xx are a share of that route's own traffic, so a low-volume route erroring constantly still stands out. Sort by any column, or filter the Route column to narrow to one endpoint.",
           "id": 10,
           "links": [],
-          "title": "Top Routes by Traffic",
+          "title": "Top Routes by Traffic (top 20)",
           "vizConfig": {
             "group": "table",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
                   "custom": {
                     "align": "auto",
                     "cellOptions": {
                       "type": "auto"
                     },
-                    "footer": {
-                      "reducers": []
-                    },
-                    "inspect": false
+                    "filterable": true,
+                    "inspect": false,
+                    "minWidth": 90
                   },
+                  "decimals": 2,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
+                        "color": "text",
+                        "value": null
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Route"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 440
+                      },
+                      {
+                        "id": "custom.align",
+                        "value": "left"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Req/s"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "reqps"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "custom.width",
+                        "value": 110
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Avg latency"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "ms"
+                      },
+                      {
+                        "id": "decimals",
                         "value": 0
                       },
                       {
-                        "color": "red",
-                        "value": 80
+                        "id": "custom.width",
+                        "value": 130
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "text",
+                              "value": null
+                            },
+                            {
+                              "color": "yellow",
+                              "value": 300
+                            },
+                            {
+                              "color": "orange",
+                              "value": 800
+                            },
+                            {
+                              "color": "red",
+                              "value": 2000
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "4xx %"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "custom.width",
+                        "value": 110
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "text",
+                              "value": null
+                            },
+                            {
+                              "color": "yellow",
+                              "value": 5
+                            },
+                            {
+                              "color": "orange",
+                              "value": 25
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "5xx %"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "custom.width",
+                        "value": 110
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "text",
+                              "value": null
+                            },
+                            {
+                              "color": "orange",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "red",
+                              "value": 2
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Requests"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "short"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.width",
+                        "value": 120
                       }
                     ]
                   }
-                },
-                "overrides": []
+                ]
               },
               "options": {
                 "cellHeight": "sm",
-                "showHeader": true
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "Req/s"
+                  }
+                ]
               }
             },
             "version": "13.2.0-31775358088"
@@ -241,7 +535,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, sum by (route)(rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001))",
+                        "expr": "(sum by (route)(rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])) / clamp_min(sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])),0.0001)) and on(route) topk(10, (sum by (route)(increase(app_requests_duration_total{scrape_job=~\"$environment\"}[$__range])) / clamp_min(sum by (route)(increase(app_requests_completed_total{scrape_job=~\"$environment\"}[$__range])),1)) and on(route) (sum by (route)(increase(app_requests_completed_total{scrape_job=~\"$environment\"}[$__range])) \u003e 10))",
                         "legendFormat": "{{route}}"
                       },
                       "version": "v0"
@@ -254,10 +548,10 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "The 10 slowest routes by mean latency across the whole selected window, ignoring routes with fewer than 10 requests. The top 10 is chosen once for the window rather than re-ranked at every step, so the series stay put instead of the legend filling up with every route that ever charted.",
           "id": 11,
           "links": [],
-          "title": "Slowest Routes (avg latency)",
+          "title": "Slowest Routes (avg latency, top 10)",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -301,6 +595,8 @@
                       "mode": "off"
                     }
                   },
+                  "decimals": 0,
+                  "min": 0,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -320,13 +616,15 @@
               },
               "options": {
                 "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ],
+                  "displayMode": "table",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
-                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
@@ -354,7 +652,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "topk(10, sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "expr": "sum by (route)(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])) and on(route) topk(10, sum by (route)(increase(app_requests_completed_total{scrape_job=~\"$environment\"}[$__range])))",
                         "legendFormat": "{{route}}"
                       },
                       "version": "v0"
@@ -367,10 +665,10 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Request rate over time for the 10 routes with the most requests in the selected window. The top 10 is chosen once for the window, so the legend stays fixed.",
           "id": 12,
           "links": [],
-          "title": "Busiest Routes (req/s)",
+          "title": "Busiest Routes (top 10 req/s)",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -414,6 +712,8 @@
                       "mode": "off"
                     }
                   },
+                  "decimals": 2,
+                  "min": 0,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -433,13 +733,15 @@
               },
               "options": {
                 "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ],
+                  "displayMode": "table",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
-                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
@@ -1661,7 +1963,7 @@
                           "kind": "ElementReference",
                           "name": "panel-10"
                         },
-                        "height": 12,
+                        "height": 13,
                         "width": 24,
                         "x": 0,
                         "y": 0
@@ -1674,10 +1976,10 @@
                           "kind": "ElementReference",
                           "name": "panel-11"
                         },
-                        "height": 8,
+                        "height": 10,
                         "width": 12,
                         "x": 0,
-                        "y": 12
+                        "y": 13
                       }
                     },
                     {
@@ -1687,10 +1989,10 @@
                           "kind": "ElementReference",
                           "name": "panel-12"
                         },
-                        "height": 8,
+                        "height": 10,
                         "width": 12,
                         "x": 12,
-                        "y": 12
+                        "y": 13
                       }
                     }
                   ]
