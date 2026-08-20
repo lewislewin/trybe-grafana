@@ -13,10 +13,7 @@
           "enable": true,
           "hide": true,
           "iconColor": "rgba(0, 211, 255, 1)",
-          "legacyOptions": {
-            "type": "dashboard"
-          },
-          "name": "Annotations & Alerts",
+          "name": "Annotations \u0026 Alerts",
           "query": {
             "datasource": {
               "name": "-- Grafana --"
@@ -30,7 +27,7 @@
       }
     ],
     "cursorSync": "Off",
-    "description": "Live Redis INFO from /shop/internal/metrics \u2014 hits, misses, memory, clients, evictions, and ops/sec.",
+    "description": "Live Redis INFO from /shop/internal/metrics — hits, misses, memory, clients, evictions, and ops/sec.",
     "editable": true,
     "elements": {
       "panel-1": {
@@ -101,16 +98,154 @@
               "options": {
                 "colorMode": "value",
                 "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
                   ],
                   "fields": "",
                   "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.2.0-31997728368"
+          }
+        }
+      },
+      "panel-10": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[5m]))",
+                        "legendFormat": "requests/s"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q12"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[5m]))",
+                        "legendFormat": "jobs/s"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Q13"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "High traffic with APCu off increases direct Redis counter writes",
+          "id": 10,
+          "links": [],
+          "title": "Counter Write Pressure (requests + jobs)",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -174,16 +309,22 @@
               "options": {
                 "colorMode": "value",
                 "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
                   ],
                   "fields": "",
                   "values": false
-                }
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -247,16 +388,22 @@
               "options": {
                 "colorMode": "value",
                 "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
                   ],
                   "fields": "",
                   "values": false
-                }
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -328,16 +475,22 @@
               "options": {
                 "colorMode": "value",
                 "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
                   ],
                   "fields": "",
                   "values": false
-                }
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -359,8 +512,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "rate(app_redis_keyspace_hits_total[1m])",
-                        "legendFormat": "hits"
+                        "editorMode": "code",
+                        "expr": "rate(app_redis_keyspace_hits_total{scrape_job=~\"$environment\"}[1m])",
+                        "legendFormat": "hits",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -401,29 +556,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "ops",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ops"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -445,8 +646,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "app_redis_instantaneous_ops_per_sec",
-                        "legendFormat": "ops/s"
+                        "editorMode": "code",
+                        "expr": "app_redis_instantaneous_ops_per_sec{scrape_job=~\"$environment\"}",
+                        "legendFormat": "ops/s",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -468,29 +671,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "ops",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ops"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -512,8 +761,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "app_redis_used_memory_bytes",
-                        "legendFormat": "memory"
+                        "editorMode": "code",
+                        "expr": "app_redis_used_memory_bytes{scrape_job=~\"$environment\"}",
+                        "legendFormat": "memory",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -535,29 +786,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "bytes",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -579,8 +876,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "rate(app_redis_evicted_keys_total[1m])",
-                        "legendFormat": "evictions/s"
+                        "editorMode": "code",
+                        "expr": "rate(app_redis_evicted_keys_total{scrape_job=~\"$environment\"}[1m])",
+                        "legendFormat": "evictions/s",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -621,29 +920,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       },
@@ -665,7 +1010,9 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "app_metrics_apcu_enabled"
+                        "editorMode": "code",
+                        "expr": "app_metrics_apcu_enabled{scrape_job=~\"$environment\"}",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -677,7 +1024,7 @@
               "transformations": []
             }
           },
-          "description": "Counter aggregation layer \u2014 reduces Redis write volume from PHP workers",
+          "description": "Counter aggregation layer — reduces Redis write volume from PHP workers",
           "id": 9,
           "links": [],
           "title": "Metrics APCu Enabled",
@@ -707,102 +1054,22 @@
               "options": {
                 "colorMode": "value",
                 "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
                   ],
                   "fields": "",
                   "values": false
-                }
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "version": "13.2.0-30402795349"
-          }
-        }
-      },
-      "panel-10": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_requests_completed_total{scrape_job=~\"$environment\"}[5m]))",
-                        "legendFormat": "requests/s"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q12"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "grafanacloud-prom"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[5m]))",
-                        "legendFormat": "jobs/s"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Q13"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "High traffic with APCu off increases direct Redis counter writes",
-          "id": 10,
-          "links": [],
-          "title": "Counter Write Pressure (requests + jobs)",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "unit": "short",
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineWidth": 2,
-                    "showPoints": "never"
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "13.2.0-30402795349"
+            "version": "13.2.0-31997728368"
           }
         }
       }
@@ -988,136 +1255,136 @@
     },
     "links": [
       {
+        "asDropdown": false,
+        "icon": "cloud",
+        "includeVars": false,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Playground",
-        "type": "link",
-        "icon": "cloud",
         "tooltip": "This dashboard scoped to Playground (playground-metrics-scrape)",
-        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=playground-metrics-scrape&var-service=$__all&var-deployment_environment=playground",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": false,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=playground-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=playground"
       },
       {
+        "asDropdown": false,
+        "icon": "cloud",
+        "includeVars": false,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Staging",
-        "type": "link",
-        "icon": "cloud",
         "tooltip": "This dashboard scoped to Staging (stage-metrics-scrape)",
-        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=stage-metrics-scrape&var-service=$__all&var-deployment_environment=staging&var-deployment_environment=stage",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": false,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=stage-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=staging\u0026var-deployment_environment=stage"
       },
       {
-        "title": "Production",
-        "type": "link",
+        "asDropdown": false,
         "icon": "cloud",
-        "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
-        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=production-metrics-scrape&var-service=$__all&var-deployment_environment=production",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
         "includeVars": false,
-        "keepTime": true
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Production",
+        "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
+        "type": "link",
+        "url": "/d/trybe-redis-valkey/redis-2f-valkey?var-environment=production-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=production"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Platform Health",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Platform Health",
-        "url": "/d/dbfvo1lxkhqi9sd",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
-      },
-      {
-        "title": "Requests \u2014 Full Overview",
         "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Requests \u2014 Full Overview",
-        "url": "/d/ddfvo1r1k0xczka",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "url": "/d/dbfvo1lxkhqi9sd"
       },
       {
-        "title": "Queues & Jobs",
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Requests — Full Overview",
+        "tooltip": "Requests — Full Overview",
         "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Queues & Jobs",
-        "url": "/d/dffvo1phlivqwwc",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "url": "/d/ddfvo1r1k0xczka"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Queues \u0026 Jobs",
+        "tooltip": "Queues \u0026 Jobs",
+        "type": "link",
+        "url": "/d/dffvo1phlivqwwc"
+      },
+      {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Redis / Valkey",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Redis / Valkey",
-        "url": "/d/trybe-redis-valkey",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-redis-valkey"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Commerce Funnel",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Commerce Funnel",
-        "url": "/d/trybe-commerce-funnel",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-commerce-funnel"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Site Health",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Site Health",
-        "url": "/d/trybe-site-health",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-site-health"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Performance Forensics",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Performance Forensics",
-        "url": "/d/trybe-performance-forensics",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-performance-forensics"
       },
       {
-        "title": "Errors & Exceptions",
-        "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Errors & Exceptions",
-        "url": "/d/trybe-errors-exceptions",
-        "tags": [],
         "asDropdown": false,
-        "targetBlank": false,
+        "icon": "dashboard",
         "includeVars": true,
-        "keepTime": true
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Errors \u0026 Exceptions",
+        "tooltip": "Errors \u0026 Exceptions",
+        "type": "link",
+        "url": "/d/trybe-errors-exceptions"
       }
     ],
     "liveNow": false,
@@ -1150,14 +1417,10 @@
     "title": "Redis / Valkey",
     "variables": [
       {
-        "datasource": {
-          "name": "grafanacloud-prom"
-        },
-        "group": "prometheus",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -1181,19 +1444,16 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
       },
       {
-        "datasource": {
-          "name": "grafanacloud-logs"
-        },
-        "group": "loki",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*shop-api",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -1219,19 +1479,16 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
       },
       {
-        "datasource": {
-          "name": "grafanacloud-logs"
-        },
-        "group": "loki",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -1257,6 +1514,7 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
