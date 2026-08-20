@@ -425,7 +425,9 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "rate(app_redis_keyspace_hits_total[1m]) / clamp_min(rate(app_redis_keyspace_hits_total[1m]) + rate(app_redis_keyspace_misses_total[1m]), 1e-9)"
+                        "editorMode": "code",
+                        "expr": "rate(app_redis_keyspace_hits_total{scrape_job=~\"$environment\"}[1m]) / clamp_min(rate(app_redis_keyspace_hits_total{scrape_job=~\"$environment\"}[1m]) + rate(app_redis_keyspace_misses_total{scrape_job=~\"$environment\"}[1m]), 1e-9)",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -1141,6 +1143,19 @@
                         "x": 12,
                         "y": 0
                       }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        },
+                        "height": 4,
+                        "width": 4,
+                        "x": 16,
+                        "y": 0
+                      }
                     }
                   ]
                 }
@@ -1227,24 +1242,11 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-9"
-                        },
-                        "height": 4,
-                        "width": 4,
-                        "x": 0,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
                           "name": "panel-10"
                         },
                         "height": 8,
                         "width": 16,
-                        "x": 4,
+                        "x": 0,
                         "y": 0
                       }
                     }
