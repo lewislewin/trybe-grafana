@@ -13,10 +13,7 @@
           "enable": true,
           "hide": true,
           "iconColor": "rgba(0, 211, 255, 1)",
-          "legacyOptions": {
-            "type": "dashboard"
-          },
-          "name": "Annotations & Alerts",
+          "name": "Annotations \u0026 Alerts",
           "query": {
             "datasource": {
               "name": "-- Grafana --"
@@ -52,9 +49,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(quantile_over_time(0.50, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "p50",
                         "maxLines": 100,
-                        "legendFormat": "p50"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -73,9 +70,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(quantile_over_time(0.95, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "p95",
                         "maxLines": 100,
-                        "legendFormat": "p95"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -94,9 +91,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(quantile_over_time(0.99, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "p99",
                         "maxLines": 100,
-                        "legendFormat": "p99"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -111,36 +108,310 @@
           "description": "",
           "id": 1,
           "links": [],
-          "title": "p50 / p95 / p99 \u2014 All Routes",
+          "title": "p50 / p95 / p99 — All Routes",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "ms",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ms"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
+          }
+        }
+      },
+      "panel-10": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "topk(10, sum by (route) (rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])) / sum by (route) (rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "legendFormat": "{{route}}",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Top routes by average request latency",
+          "id": 10,
+          "links": [],
+          "title": "Avg Latency by Route",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ms"
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.3.0-34942711622"
+          }
+        }
+      },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "topk(10, sum by (route) (rate(app_requests_duration_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "legendFormat": "{{route}}",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Total request-processing time consumed per second (rps × avg latency) — top routes worth optimizing",
+          "id": 11,
+          "links": [],
+          "title": "Optimization Score by Route (rps × latency)",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ms"
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -163,9 +434,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "topk(10, quantile_over_time(0.95, {service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]) by (route))",
-                        "queryType": "range",
+                        "legendFormat": "{{route}}",
                         "maxLines": 100,
-                        "legendFormat": "{{route}}"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -187,29 +458,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "ms",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ms"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -232,9 +549,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(avg_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "monitored",
                         "maxLines": 100,
-                        "legendFormat": "monitored"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -253,9 +570,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(avg_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace | unwrap duration_ms [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "unmonitored",
                         "maxLines": 100,
-                        "legendFormat": "unmonitored"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -270,36 +587,82 @@
           "description": "Confirms sample fraction and overhead of query monitoring",
           "id": 3,
           "links": [],
-          "title": "Avg Latency \u2014 Monitored vs Unmonitored",
+          "title": "Avg Latency — Monitored vs Unmonitored",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "ms",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "ms"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -322,9 +685,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"true\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "monitored",
                         "maxLines": 100,
-                        "legendFormat": "monitored"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -343,9 +706,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "sum(count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.monitor_active\" | active=\"false\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m]))",
-                        "queryType": "range",
+                        "legendFormat": "unmonitored",
                         "maxLines": 100,
-                        "legendFormat": "unmonitored"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -360,36 +723,82 @@
           "description": "",
           "id": 4,
           "links": [],
-          "title": "Request Volume \u2014 Monitored vs Unmonitored",
+          "title": "Request Volume — Monitored vs Unmonitored",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -412,9 +821,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
-                        "queryType": "range",
+                        "legendFormat": "{{route}}",
                         "maxLines": 100,
-                        "legendFormat": "{{route}}"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -436,29 +845,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -481,9 +936,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "topk(10, sum by (route) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"request.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
-                        "queryType": "range",
+                        "legendFormat": "{{route}}",
                         "maxLines": 100,
-                        "legendFormat": "{{route}}"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -505,29 +960,75 @@
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
                     "lineWidth": 2,
-                    "showPoints": "never"
-                  }
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
                 },
                 "overrides": []
               },
               "options": {
                 "legend": {
+                  "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
                 }
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -550,9 +1051,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "topk(15, sum by (query_pattern) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.slow\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace [5m])))",
-                        "queryType": "range",
+                        "legendFormat": "count",
                         "maxLines": 100,
-                        "legendFormat": "count"
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -575,16 +1076,37 @@
               "fieldConfig": {
                 "defaults": {
                   "custom": {
-                    "align": "auto"
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
                   }
                 },
                 "overrides": []
               },
               "options": {
+                "cellHeight": "sm",
                 "showHeader": true
               }
             },
-            "version": ""
+            "version": "13.3.0-34942711622"
           }
         }
       },
@@ -607,8 +1129,8 @@
                       "kind": "DataQuery",
                       "spec": {
                         "expr": "{service_name=~\"$service\", deployment_environment=~\"$deployment_environment\"} |= \"query.n_plus_one\" | drop instance, k8s_pod_name, k8s_container_name, exported_instance, detected_level, exporter, telemetry_sdk_name, telemetry_sdk_language, telemetry_sdk_version, service_version, service_namespace",
-                        "queryType": "range",
-                        "maxLines": 100
+                        "maxLines": 100,
+                        "queryType": "range"
                       },
                       "version": "v0"
                     },
@@ -634,13 +1156,135 @@
               },
               "options": {
                 "dedupStrategy": "none",
+                "enableInfiniteScrolling": false,
                 "enableLogDetails": true,
+                "prettifyLogMessage": true,
+                "showControls": false,
+                "showFieldSelector": false,
+                "showLevel": true,
+                "showLogAttributes": true,
                 "showTime": true,
                 "sortOrder": "Descending",
+                "timestampResolution": "ms",
+                "unwrappedColumns": false,
                 "wrapLogMessage": true
               }
             },
-            "version": "13.2.0-30402795349"
+            "version": "13.3.0-34942711622"
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "grafanacloud-prom"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "topk(10, sum by (route) (rate(app_requests_completed_total{scrape_job=~\"$environment\"}[$__rate_interval])))",
+                        "legendFormat": "{{route}}",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Top routes by request rate",
+          "id": 9,
+          "links": [],
+          "title": "Request Rate by Route",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "reqps"
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.3.0-34942711622"
           }
         }
       }
@@ -649,6 +1293,59 @@
       "kind": "RowsLayout",
       "spec": {
         "rows": [
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        },
+                        "height": 8,
+                        "width": 12,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-10"
+                        },
+                        "height": 8,
+                        "width": 12,
+                        "x": 12,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-11"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Optimization Score"
+            }
+          },
           {
             "kind": "RowsLayoutRow",
             "spec": {
@@ -800,136 +1497,136 @@
     },
     "links": [
       {
+        "asDropdown": false,
+        "icon": "cloud",
+        "includeVars": false,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Playground",
-        "type": "link",
-        "icon": "cloud",
         "tooltip": "This dashboard scoped to Playground (playground-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=playground-metrics-scrape&var-service=$__all&var-deployment_environment=playground",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": false,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=playground-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=playground"
       },
       {
+        "asDropdown": false,
+        "icon": "cloud",
+        "includeVars": false,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Staging",
-        "type": "link",
-        "icon": "cloud",
         "tooltip": "This dashboard scoped to Staging (stage-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=stage-metrics-scrape&var-service=$__all&var-deployment_environment=staging&var-deployment_environment=stage",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": false,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=stage-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=staging\u0026var-deployment_environment=stage"
       },
       {
-        "title": "Production",
-        "type": "link",
+        "asDropdown": false,
         "icon": "cloud",
-        "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
-        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=production-metrics-scrape&var-service=$__all&var-deployment_environment=production",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
         "includeVars": false,
-        "keepTime": true
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Production",
+        "tooltip": "This dashboard scoped to Production (production-metrics-scrape)",
+        "type": "link",
+        "url": "/d/trybe-performance-forensics/performance-forensics?var-environment=production-metrics-scrape\u0026var-service=$__all\u0026var-deployment_environment=production"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Platform Health",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Platform Health",
-        "url": "/d/dbfvo1lxkhqi9sd",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
-      },
-      {
-        "title": "Requests \u2014 Full Overview",
         "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Requests \u2014 Full Overview",
-        "url": "/d/ddfvo1r1k0xczka",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "url": "/d/dbfvo1lxkhqi9sd"
       },
       {
-        "title": "Queues & Jobs",
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Requests — Full Overview",
+        "tooltip": "Requests — Full Overview",
         "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Queues & Jobs",
-        "url": "/d/dffvo1phlivqwwc",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "url": "/d/ddfvo1r1k0xczka"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Queues \u0026 Jobs",
+        "tooltip": "Queues \u0026 Jobs",
+        "type": "link",
+        "url": "/d/dffvo1phlivqwwc"
+      },
+      {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Redis / Valkey",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Redis / Valkey",
-        "url": "/d/trybe-redis-valkey",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-redis-valkey"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Commerce Funnel",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Commerce Funnel",
-        "url": "/d/trybe-commerce-funnel",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-commerce-funnel"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Site Health",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Site Health",
-        "url": "/d/trybe-site-health",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-site-health"
       },
       {
+        "asDropdown": false,
+        "icon": "dashboard",
+        "includeVars": true,
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
         "title": "Performance Forensics",
-        "type": "link",
-        "icon": "dashboard",
         "tooltip": "Performance Forensics",
-        "url": "/d/trybe-performance-forensics",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": false,
-        "includeVars": true,
-        "keepTime": true
+        "type": "link",
+        "url": "/d/trybe-performance-forensics"
       },
       {
-        "title": "Errors & Exceptions",
-        "type": "link",
-        "icon": "dashboard",
-        "tooltip": "Errors & Exceptions",
-        "url": "/d/trybe-errors-exceptions",
-        "tags": [],
         "asDropdown": false,
-        "targetBlank": false,
+        "icon": "dashboard",
         "includeVars": true,
-        "keepTime": true
+        "keepTime": true,
+        "tags": [],
+        "targetBlank": false,
+        "title": "Errors \u0026 Exceptions",
+        "tooltip": "Errors \u0026 Exceptions",
+        "type": "link",
+        "url": "/d/trybe-errors-exceptions"
       }
     ],
     "liveNow": false,
@@ -962,14 +1659,10 @@
     "title": "Performance Forensics",
     "variables": [
       {
-        "datasource": {
-          "name": "grafanacloud-prom"
-        },
-        "group": "prometheus",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -993,19 +1686,16 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
       },
       {
-        "datasource": {
-          "name": "grafanacloud-logs"
-        },
-        "group": "loki",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*shop-api",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -1031,19 +1721,16 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
       },
       {
-        "datasource": {
-          "name": "grafanacloud-logs"
-        },
-        "group": "loki",
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
           "allValue": ".*",
+          "allowCustomValue": true,
           "current": {
             "text": "All",
             "value": "$__all"
@@ -1069,6 +1756,7 @@
           },
           "refresh": "onDashboardLoad",
           "regex": "",
+          "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "alphabeticalAsc"
         }
