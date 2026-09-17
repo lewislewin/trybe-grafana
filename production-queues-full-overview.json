@@ -286,7 +286,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "expr": "sum by (queue)(label_replace(label_replace(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\"))",
                         "legendFormat": "dispatched {{queue}}"
                       },
                       "version": "v0"
@@ -305,7 +305,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "expr": "sum by (queue)(label_replace(label_replace(rate(app_jobs_processed_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\"))",
                         "legendFormat": "processed {{queue}}"
                       },
                       "version": "v0"
@@ -318,7 +318,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Queue labels normalised across both metrics (env suffix + app prefix stripped); sync queue excluded",
           "id": 11,
           "links": [],
           "title": "Dispatched vs Processed by Queue",
@@ -418,7 +418,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum by (queue)(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\"}[$__rate_interval])) - sum by (queue)(rate(app_jobs_processed_total{scrape_job=~\"$environment\"}[$__rate_interval]))",
+                        "expr": "(sum by (queue)(label_replace(label_replace(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\")) or (sum by (queue)(label_replace(label_replace(rate(app_jobs_processed_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\"))) * 0) - ((sum by (queue)(label_replace(label_replace(rate(app_jobs_processed_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\"))) or (sum by (queue)(label_replace(label_replace(rate(app_jobs_dispatched_total{scrape_job=~\"$environment\",queue!=\"sync\"}[$__rate_interval]), \"queue\", \"$1\", \"queue\", \"(.*)-env-[0-9a-f-]+\"), \"queue\", \"$1\", \"queue\", \"cloud-shop-api-(.*)\"))) * 0)",
                         "legendFormat": "{{queue}}"
                       },
                       "version": "v0"
@@ -431,7 +431,7 @@
               "transformations": []
             }
           },
-          "description": "Positive = backlog growing",
+          "description": "Positive = backlog growing. Queue labels normalised across both metrics (env suffix + app prefix stripped); sync queue excluded",
           "id": 12,
           "links": [],
           "title": "Dispatch − Process Imbalance by Queue",
