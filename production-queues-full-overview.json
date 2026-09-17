@@ -1248,8 +1248,10 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
+                        "editorMode": "code",
                         "expr": "topk(15, sum by (job_class)(increase(app_jobs_failed_total{scrape_job=~\"$environment\"}[$__range])))",
-                        "legendFormat": "failures"
+                        "legendFormat": "{{job_class}}",
+                        "range": true
                       },
                       "version": "v0"
                     },
@@ -1266,20 +1268,47 @@
           "links": [],
           "title": "Top Job Classes by Failures (range)",
           "vizConfig": {
-            "group": "table",
+            "group": "timeseries",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
                   "custom": {
-                    "align": "auto",
-                    "cellOptions": {
-                      "type": "auto"
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
                     },
-                    "footer": {
-                      "reducers": []
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
                     },
-                    "inspect": false
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
                   },
                   "thresholds": {
                     "mode": "absolute",
@@ -1298,8 +1327,17 @@
                 "overrides": []
               },
               "options": {
-                "cellHeight": "sm",
-                "showHeader": true
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
               }
             },
             "version": "13.3.0-34827141479"
